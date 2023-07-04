@@ -1,4 +1,4 @@
-0. Consider using Swift.
+0. Consider using Swing.
 
 1. Design the structure of the quiz game:
 
