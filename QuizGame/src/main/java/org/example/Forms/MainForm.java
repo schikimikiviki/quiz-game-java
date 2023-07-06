@@ -1,5 +1,7 @@
 package org.example.Forms;
 
+import org.example.classes.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -10,25 +12,43 @@ public class MainForm implements ActionListener {
     private JFrame frame = new JFrame();
     private JPanel panel = new JPanel();
 
+    JButton exitGameButton = new JButton("Exit the game");
+    JButton startGameButton = new JButton("Start the game");
+    JLabel label = new JLabel("Welcome to the quiz");
+
+    JLabel questionLabel = new JLabel("");
+    JButton answerOne = new JButton("");
+    JButton answerTwo = new JButton("");
+    JButton answerThree = new JButton("");
+    JButton answerFour = new JButton("");
+    JLabel feedbackLabel = new JLabel("");
+    JLabel score = new JLabel("");
     public MainForm() {
-        JButton exitGameButton = new JButton("Exit the game");
-        JButton startGameButton = new JButton("Start the game");
+
         exitGameButton.addActionListener(this);
         startGameButton.addActionListener(this);
-        JLabel label = new JLabel("Welcome to the quiz");
 
         // Make font bigger
-        Font currentFont = label.getFont();
-        Font currentFontButton = exitGameButton.getFont();
-        Font currentFontButton2 = startGameButton.getFont();
-        Font biggerFont = currentFont.deriveFont(currentFont.getSize() + 30f);
-        Font biggerButtonFont = currentFontButton.deriveFont(currentFontButton.getSize() + 20f);
-        Font biggerButtonFont2 = currentFontButton2.deriveFont(currentFontButton2.getSize() + 20f);
-        startGameButton.setFont(biggerButtonFont2);
-        exitGameButton.setFont(biggerButtonFont);
-        label.setFont(biggerFont);
+        Font baseFont = UIManager.getFont("Label.font");
+        float fontSizeBig = 30f;
+        float fontSizeMedium = 20f;
 
-        panel.setLayout(new GridLayout(5, 2));
+        Font mediumFont = baseFont.deriveFont(baseFont.getSize2D() + fontSizeMedium);
+        Font bigFont = baseFont.deriveFont(baseFont.getSize2D() + fontSizeBig);
+
+        startGameButton.setFont(mediumFont);
+        exitGameButton.setFont(mediumFont);
+        label.setFont(bigFont);
+        score.setFont(mediumFont);
+        questionLabel.setFont(mediumFont);
+        answerOne.setFont(mediumFont);
+        answerTwo.setFont(mediumFont);
+        answerThree.setFont(mediumFont);
+        answerFour.setFont(mediumFont);
+        feedbackLabel.setFont(mediumFont);
+
+
+        panel.setLayout(new GridLayout(10, 2));
 
         // Create nested panel with FlowLayout for margin/padding around the label
         JPanel labelPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -39,9 +59,22 @@ public class MainForm implements ActionListener {
         buttonPanel.add(startGameButton);
         buttonPanel.add(exitGameButton);
 
+        //set answers to invisible
+        answerOne.setVisible(false);
+        answerTwo.setVisible(false);
+        answerThree.setVisible(false);
+        answerFour.setVisible(false);
+        feedbackLabel.setVisible(false);
+
         panel.add(labelPanel);
-        panel.add(new JPanel()); // Empty cell for whitespace
+        panel.add(score);
+        panel.add(questionLabel);
+        panel.add(answerOne);
+        panel.add(answerTwo);
         panel.add(buttonPanel);
+        panel.add(answerThree);
+        panel.add(answerFour);
+        panel.add(feedbackLabel);
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().add(panel);
@@ -51,6 +84,29 @@ public class MainForm implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
-        // Handle button actions here
+        Object source = actionEvent.getSource();
+        if (source == exitGameButton) {
+           // do some fun shit
+        } else if (source == startGameButton) {
+            // start game
+            label.setText("Game started!");
+
+            Quiz quiz = new Quiz();
+            Question question = quiz.getRandomQuestion();
+            Player player = new Player("player", 0);
+            score.setText("Score: " + Integer.toString(player.getScore()));
+
+           startGameButton.setVisible(false);
+           exitGameButton.setVisible(false);
+           feedbackLabel.setVisible(true);
+           answerOne.setVisible(true);
+           answerTwo.setVisible(true);
+           answerThree.setVisible(true);
+           answerFour.setVisible(true);
+
+           QuestionManager questionManager = new QuestionManager();
+           questionManager.printSingleQuestion(question, player, questionLabel, answerOne,answerTwo, answerThree, answerFour, feedbackLabel);
+
+        }
     }
 }
