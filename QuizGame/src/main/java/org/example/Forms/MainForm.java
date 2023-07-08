@@ -9,21 +9,26 @@ import java.awt.event.ActionListener;
 
 public class MainForm implements ActionListener {
 
+    private Player player;
     private JFrame frame = new JFrame();
     private JPanel panel = new JPanel();
+    Quiz quiz = new Quiz();
 
     JButton exitGameButton = new JButton("Exit the game");
     JButton startGameButton = new JButton("Start the game");
-    JLabel label = new JLabel("Welcome to the quiz");
+    JLabel label = new JLabel("Welcome to the quizzz");
 
     JLabel questionLabel = new JLabel("");
     JButton answerOne = new JButton("");
     JButton answerTwo = new JButton("");
     JButton answerThree = new JButton("");
     JButton answerFour = new JButton("");
-    JLabel feedbackLabel = new JLabel("");
-    JLabel score = new JLabel("");
+    JLabel feedbackLabel = new JLabel("", SwingConstants.CENTER);
+    JLabel score = new JLabel("", SwingConstants.CENTER);
+
     public MainForm() {
+
+        player = new Player("player", 0);
 
         exitGameButton.addActionListener(this);
         startGameButton.addActionListener(this);
@@ -71,9 +76,9 @@ public class MainForm implements ActionListener {
         panel.add(questionLabel);
         panel.add(answerOne);
         panel.add(answerTwo);
-        panel.add(buttonPanel);
         panel.add(answerThree);
         panel.add(answerFour);
+        panel.add(buttonPanel);
         panel.add(feedbackLabel);
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -82,31 +87,83 @@ public class MainForm implements ActionListener {
         frame.setVisible(true);
     }
 
+    private void startGame(Player player) {
+        label.setText("Game started!");
+
+        Question question = quiz.getRandomQuestion();
+        score.setText("Score: " + Integer.toString(player.getScore()));
+
+        startGameButton.setVisible(false);
+        exitGameButton.setVisible(false);
+        feedbackLabel.setVisible(true);
+        answerOne.setVisible(true);
+        answerTwo.setVisible(true);
+        answerThree.setVisible(true);
+        answerFour.setVisible(true);
+
+        QuestionManager questionManager = new QuestionManager();
+
+
+        ActionListener answerListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                JButton answerButton = (JButton) actionEvent.getSource();
+
+
+                int selectedAnswerIndex;
+                if (answerButton == answerOne) {
+                    selectedAnswerIndex = 0;
+                } else if (answerButton == answerTwo) {
+                    selectedAnswerIndex = 1;
+                } else if (answerButton == answerThree) {
+                    selectedAnswerIndex = 2;
+                } else {
+                    selectedAnswerIndex = 3;
+                }
+
+                int correctIndex = question.getCorrectAnswerIndex();
+                if (selectedAnswerIndex == correctIndex) {
+                    feedbackLabel.setText("Correct!");
+                    player.setScore(player.getScore() + 1);
+                } else {
+                    feedbackLabel.setText("Incorrect!");
+                    player.setScore(player.getScore() - 1);
+                }
+                score.setText("Score: " + player.getScore());
+
+                //disable other buttons
+
+                answerOne.setEnabled(false);
+                answerTwo.setEnabled(false);
+                answerThree.setEnabled(false);
+                answerFour.setEnabled(false);
+
+                startGameButton.setText("Next question");
+                startGameButton.setVisible(true);
+                exitGameButton.setVisible(true);
+                startGameButton.addActionListener(this);
+            }
+        };
+
+        int newScore = questionManager.printSingleQuestion(question, player, questionLabel, answerOne, answerTwo, answerThree, answerFour, feedbackLabel, answerListener);
+
+        player.setScore(newScore);
+        score.setText("Score: " + Integer.toString(player.getScore()));
+    }
+
+
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         Object source = actionEvent.getSource();
         if (source == exitGameButton) {
-           // do some fun shit
+            // do some fun shit
         } else if (source == startGameButton) {
-            // start game
-            label.setText("Game started!");
+            startGame(player);
 
-            Quiz quiz = new Quiz();
-            Question question = quiz.getRandomQuestion();
-            Player player = new Player("player", 0);
-            score.setText("Score: " + Integer.toString(player.getScore()));
 
-           startGameButton.setVisible(false);
-           exitGameButton.setVisible(false);
-           feedbackLabel.setVisible(true);
-           answerOne.setVisible(true);
-           answerTwo.setVisible(true);
-           answerThree.setVisible(true);
-           answerFour.setVisible(true);
-
-           QuestionManager questionManager = new QuestionManager();
-           questionManager.printSingleQuestion(question, player, questionLabel, answerOne,answerTwo, answerThree, answerFour, feedbackLabel);
-
+            //TODO: implement next question
         }
     }
+
+
 }

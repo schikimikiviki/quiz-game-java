@@ -8,15 +8,7 @@ import java.util.InputMismatchException;
 
 public class QuestionManager {
 
-//    private JFrame frame;
-//    private JPanel panel;
-//
-//    public QuestionManager(JFrame frame, JPanel panel) {
-//        this.frame = frame;
-//        this.panel = panel;
-//    }
-
-    public void printSingleQuestion(Question question, Player player, JLabel questionLabel, JButton answerOne, JButton answerTwo, JButton answerThree, JButton answerFour, JLabel feedbackLabel) {
+    public int printSingleQuestion(Question question, Player player, JLabel questionLabel, JButton answerOne, JButton answerTwo, JButton answerThree, JButton answerFour, JLabel feedbackLabel,  ActionListener answerListener) {
 
 
         try {
@@ -29,56 +21,25 @@ public class QuestionManager {
             answerThree.setText(question.answers[2]);
             answerFour.setText(question.answers[3]);
 
-            int correctIndex = question.getCorrectAnswerIndex();
+            ButtonGroup buttonGroup = new ButtonGroup();
+            buttonGroup.add(answerOne);
+            buttonGroup.add(answerTwo);
+            buttonGroup.add(answerThree);
+            buttonGroup.add(answerFour);
 
+            feedbackLabel.setText("");
 
-            answerOne.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
+            answerOne.addActionListener(answerListener);
+            answerTwo.addActionListener(answerListener);
+            answerThree.addActionListener(answerListener);
+            answerFour.addActionListener(answerListener);
 
-                    if (correctIndex == 0) {
-                        feedbackLabel.setText("Correct!");
-                        player.setScore(player.getScore() + 1);
-                    } else {
-                        feedbackLabel.setText("Incorrect!");
-                    }
-                }
-            });
-            answerTwo.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    if (correctIndex == 1) {
-                        feedbackLabel.setText("Correct!");
-                        player.setScore(player.getScore() + 1);
-                    } else {
-                        feedbackLabel.setText("Incorrect!");
-                    }
-                }
-            });
-            answerThree.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    if (correctIndex == 2) {
-                        feedbackLabel.setText("Correct!");
-                        player.setScore(player.getScore() + 1);
-                    } else {
-                        feedbackLabel.setText("Incorrect!");
-                    }
-                }
-            });
-            answerFour.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    if (correctIndex == 3) {
-                        feedbackLabel.setText("Correct!");
-                        player.setScore(player.getScore() + 1);
-                    } else {
-                        feedbackLabel.setText("Incorrect!");
-                    }
-                }
-            });
+            answerOne.setEnabled(true);
+            answerTwo.setEnabled(true);
+            answerThree.setEnabled(true);
+            answerFour.setEnabled(true);
 
-
+            return player.getScore();
         } catch (InterruptedException e) {
             // Handle InterruptedException
             e.printStackTrace();
@@ -86,6 +47,8 @@ public class QuestionManager {
             // Handle InputMismatchException
             e.printStackTrace();
         }
+
+        return player.getScore();
     }
 
 
