@@ -1,15 +1,22 @@
 package org.example.Forms;
 
 import org.example.classes.*;
+import org.example.classes.Error;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.net.URL;
+import java.util.Random;
+import java.util.TimerTask;
+import java.util.Timer;
+
 
 public class MainForm implements ActionListener {
 
-    private Player player;
+
     private JFrame frame = new JFrame();
     private JPanel panel = new JPanel();
     Quiz quiz = new Quiz();
@@ -24,11 +31,12 @@ public class MainForm implements ActionListener {
     JButton answerThree = new JButton("");
     JButton answerFour = new JButton("");
     JLabel feedbackLabel = new JLabel("", SwingConstants.CENTER);
-    JLabel score = new JLabel("", SwingConstants.CENTER);
+    //JLabel scoreLabel = new JLabel("", SwingConstants.CENTER);
+
+    Player player = new Player("", 0);
 
     public MainForm() {
 
-        player = new Player("player", 0);
 
         exitGameButton.addActionListener(this);
         startGameButton.addActionListener(this);
@@ -44,7 +52,7 @@ public class MainForm implements ActionListener {
         startGameButton.setFont(mediumFont);
         exitGameButton.setFont(mediumFont);
         label.setFont(bigFont);
-        score.setFont(mediumFont);
+        //scoreLabel.setFont(mediumFont);
         questionLabel.setFont(mediumFont);
         answerOne.setFont(mediumFont);
         answerTwo.setFont(mediumFont);
@@ -72,7 +80,7 @@ public class MainForm implements ActionListener {
         feedbackLabel.setVisible(false);
 
         panel.add(labelPanel);
-        panel.add(score);
+        //panel.add(scoreLabel);
         panel.add(questionLabel);
         panel.add(answerOne);
         panel.add(answerTwo);
@@ -87,11 +95,11 @@ public class MainForm implements ActionListener {
         frame.setVisible(true);
     }
 
-    private void startGame(Player player) {
+    private void startGame() {
         label.setText("Game started!");
 
         Question question = quiz.getRandomQuestion();
-        score.setText("Score: " + Integer.toString(player.getScore()));
+        // scoreLabel.setText("Score: " + Integer.toString(player.getScore()));
 
         startGameButton.setVisible(false);
         exitGameButton.setVisible(false);
@@ -101,35 +109,36 @@ public class MainForm implements ActionListener {
         answerThree.setVisible(true);
         answerFour.setVisible(true);
 
-        QuestionManager questionManager = new QuestionManager();
-
-
         ActionListener answerListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 JButton answerButton = (JButton) actionEvent.getSource();
 
 
-                int selectedAnswerIndex;
+                int selectedAnswerIndex = 0;
+
                 if (answerButton == answerOne) {
                     selectedAnswerIndex = 0;
                 } else if (answerButton == answerTwo) {
                     selectedAnswerIndex = 1;
                 } else if (answerButton == answerThree) {
                     selectedAnswerIndex = 2;
-                } else {
+                } else if(answerButton == answerFour) {
                     selectedAnswerIndex = 3;
                 }
 
                 int correctIndex = question.getCorrectAnswerIndex();
+
                 if (selectedAnswerIndex == correctIndex) {
                     feedbackLabel.setText("Correct!");
                     player.setScore(player.getScore() + 1);
-                } else {
+                    System.out.println(player.getScore());
+                } else if (selectedAnswerIndex != correctIndex){
                     feedbackLabel.setText("Incorrect!");
                     player.setScore(player.getScore() - 1);
+                    System.out.println(player.getScore());
                 }
-                score.setText("Score: " + player.getScore());
+                // scoreLabel.setText("Score: " + player.getScore());
 
                 //disable other buttons
 
@@ -145,10 +154,10 @@ public class MainForm implements ActionListener {
             }
         };
 
-        int newScore = questionManager.printSingleQuestion(question, player, questionLabel, answerOne, answerTwo, answerThree, answerFour, feedbackLabel, answerListener);
 
-        player.setScore(newScore);
-        score.setText("Score: " + Integer.toString(player.getScore()));
+        printSingleQuestion(question, questionLabel, answerOne, answerTwo, answerThree, answerFour, feedbackLabel, answerListener);
+
+        //scoreLabel.setText("Score: " + Integer.toString(player.getScore()));
     }
 
 
@@ -156,13 +165,44 @@ public class MainForm implements ActionListener {
     public void actionPerformed(ActionEvent actionEvent) {
         Object source = actionEvent.getSource();
         if (source == exitGameButton) {
-            // do some fun shit
+            Error error = new Error();
+            error.openMultipleWindowsWithDelay(20, 500, frame);
+
         } else if (source == startGameButton) {
-            startGame(player);
-
-
-            //TODO: implement next question
+            startGame();
         }
+
+
+    }
+
+    public void printSingleQuestion(Question question, JLabel questionLabel, JButton answerOne, JButton answerTwo, JButton answerThree, JButton answerFour, JLabel feedbackLabel, ActionListener answerListener) {
+
+
+        questionLabel.setText(question.question);
+
+        answerOne.setText(question.answers[0]);
+        answerTwo.setText(question.answers[1]);
+        answerThree.setText(question.answers[2]);
+        answerFour.setText(question.answers[3]);
+
+        ButtonGroup buttonGroup = new ButtonGroup();
+        buttonGroup.add(answerOne);
+        buttonGroup.add(answerTwo);
+        buttonGroup.add(answerThree);
+        buttonGroup.add(answerFour);
+
+        feedbackLabel.setText("");
+
+        answerOne.addActionListener(answerListener);
+        answerTwo.addActionListener(answerListener);
+        answerThree.addActionListener(answerListener);
+        answerFour.addActionListener(answerListener);
+
+        answerOne.setEnabled(true);
+        answerTwo.setEnabled(true);
+        answerThree.setEnabled(true);
+        answerFour.setEnabled(true);
+
     }
 
 
